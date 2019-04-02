@@ -78,75 +78,73 @@ def PULSE_LEFT(delay):
 
 
 
-									#Program Start Here#
+					#Program Start Here#
 #-------------------------------------------------------------------------------------------------------------------------------#
-screen = curses.initscr()	#Initialize Curses on current terminal
+screen = curses.initscr()		#Initialize Curses on current terminal
 curses.noecho()				#Turn Keyboard echo off
 curses.cbreak()				#Turn on instant key response (no waiting)  
 screen.keypad(True)			#Use special values for cursor keys
 
 
-GPIO_voidInitialize()		#Initialize GPIO
+GPIO_voidInitialize()			#Initialize GPIO
 Init_Sonic()				#Initialize Ultrasonic
 
 Current_Speed=0				#Set starting speed with 0 (lowest)
-Race_Mode=1					#Set RaceMode flag as disabled (Inverted Logic)
+Race_Mode=1				#Set RaceMode flag as disabled (Inverted Logic)
 Reading_Interval=0			#Take an UltraSonic reading after a certain Number of Characters is read  
 
 try:
         
 	while True:
-	    Reading_Interval += 1							#After each character read from terminal increment Counter by 1.
+	    Reading_Interval += 1			#After each character read from terminal increment Counter by 1.
             if Reading_Interval > 100 and Race_Mode:	#After a 100 Readings call the ultrasonic function and prinnt the read value on the screen.
-	    	Get_Distance()								#Read Value. 	
-            	Reading_Interval=0						#Reset Counter
-	    char = screen.getch()							#Store typed character into a variable.
+	    	Get_Distance()					#Read Value. 	
+            	Reading_Interval=0				#Reset Counter
+	    char = screen.getch()			#Store typed character into a variable.
            													
-            if char == ord('q'):						#If input character is the "q" key
-                break									#Quit Control Script.
+            if char == ord('q'):			#If input character is the "q" key
+                break						#Quit Control Script.
            
-            elif char == curses.KEY_UP:					#If input character is the "q" key
-                PULSE_FWD(0.001*Current_Speed)				#Call the pulse forward function with a (Speed*Constant Number)
-		#if screen.getch()== curses.KEY_RIGHT:
-			#print("Swing")
-			#PULSE_FWD(0.001*(Speed))
+            elif char == curses.KEY_UP:			#If input character is the "q" key
+                PULSE_FWD(0.001*Current_Speed)			#Call the pulse forward function with a (Speed*Constant Number)
+		#if screen.getch()== curses.KEY_RIGHT:	#In this second if check , it was intended to handle the right/left presses
+			#print("Swing")			#while the upwards key is pressed, but the control became sluggish so it was
+			#PULSE_FWD(0.001*(Speed))	#commented out.
 		#else:
-	    elif char == curses.KEY_DOWN:					#If input character is the DOWN key
-                PULSE_BKWD(0.001*Current_Speed)				#Call the pulse backward function with a (Speed*Constant Number) 
+	    elif char == curses.KEY_DOWN:		#If input character is the DOWN key
+                PULSE_BKWD(0.001*Current_Speed)			#Call the pulse backward function with a (Speed*Constant Number) 
           
-            elif char == curses.KEY_RIGHT:				#If input character is the RIGHT key
-           	PULSE_RIGHT(0.001*Current_Speed) 				#Call the pulse RIGHT function with a (Speed*Constant Number)
+            elif char == curses.KEY_RIGHT:		#If input character is the RIGHT key
+           	PULSE_RIGHT(0.001*Current_Speed) 		#Call the pulse RIGHT function with a (Speed*Constant Number)
 	    
-	    elif char == curses.KEY_LEFT:					#If input character is the LEFT key
-                PULSE_LEFT(0.001*Current_Speed)				#Call the pulse LEFT function with a (Speed*Constant Number)
+	    elif char == curses.KEY_LEFT:		#If input character is the LEFT key
+                PULSE_LEFT(0.001*Current_Speed)			#Call the pulse LEFT function with a (Speed*Constant Number)
         
-            elif char == 10:							#If input character is the ENTER key
-		Get_Distance()										#Take an instant reading from the ultrasonic.
+            elif char == 10:				#If input character is the ENTER key
+		Get_Distance()					#Take an instant reading from the ultrasonic.
 	    
-	    elif char == 97:								#If input character is the "a" key
-		
-		if Current_Speed < 10:								 #Checks if the Speed variable is less than the max Gear(10),IF true 
-			Current_Speed +=1								 		#Increase speed by 1 .
+	    elif char == 97:				#If input character is the "a" key
+		if Current_Speed < 10:				 #Checks if the Speed variable is less than the max Gear(10),IF true 
+			Current_Speed +=1						#Increase speed by 1 .
 			print("Current Speed ="+str(Current_Speed)+"\r")		#Print on the screen the current Speed Gear Value.
 		else :
-			print("Max Speed Reached Gear 10\r")					#If Max speed is already reached, Notify the user that this is the max speed.
+			print("Max Speed Reached Gear 10\r")	#If Max speed is already reached, Notify the user that this is the max speed.
 	    
-	    elif char == 122:									#Checks if the Speed variable is higher than the max Gear(0),IF true.
-
-		if Current_Speed > 0:									#Checks if the Speed vairable is bigger than 0 ,IF true 
-			Current_Speed -=1										#Decrease speed variable by 1.  
+	    elif char == 122:				#Checks if the Speed variable is higher than the max Gear(0),IF true,
+		if Current_Speed > 0:				#Checks if the Speed vairable is bigger than 0 ,IF true 
+			Current_Speed -=1						#Decrease speed variable by 1.  
 			print("Current Speed ="+str(Current_Speed)+"\r")		#Print the current speed gear for the user.
 		else :
-			print("Minimum Speed Reached Gear 0 \r")			#If Min speed is already reached, Notify the user that this is the min speed.
+			print("Minimum Speed Reached Gear 0 \r") #If Min speed is already reached, Notify the user that this is the min speed.
 	    
-	    elif char == 114:									#IF te input character is the "r" key.  
-	    	if Race_Mode == 1:									#checks if the race mode flag is set
-			print("Race Mode Armed\r")							 #Notify the user that the Race mode is activated and max speed is set.
+	    elif char == 114:				#IF te input character is the "r" key.  
+	    	if Race_Mode == 1:				#checks if the race mode flag is set
+			print("Race Mode Armed\r")			 #Notify the user that the Race mode is activated and max speed is set.
 			Race_Mode = 0
 			Current_Speed=10 
  										
-		else:												 #checks if the race mode flag is cleared.       
-			print("Race Mode Disarmed\r")					#Notify the user that the Race Mode has been disabled and minimum speed has been set 
+		else:					 #If the race mode flag is cleared.       
+			print("Race Mode Disarmed\r")		#Notify the user that the Race Mode has been disabled and minimum speed has been set 
 			Race_Mode = 1
 			Current_Speed=0 								
 
